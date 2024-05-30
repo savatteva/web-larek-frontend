@@ -45,7 +45,7 @@ yarn build
 Карточка 
 
 ```
-export interface ICard {
+interface ICard {
   id: string;
   description: string;
   image: string;
@@ -58,7 +58,7 @@ export interface ICard {
 Оформление заказа
 
 ```
-export interface IOrder {
+interface IOrder {
   payment: string;
   email: string;
   phone: string;
@@ -71,7 +71,7 @@ export interface IOrder {
 Интерфейс для модели данных карточки товара
 
 ```
-export interface ICardsData {
+interface ICardsData {
   cards: ICard[];
   preview: string | null;
 }
@@ -80,25 +80,25 @@ export interface ICardsData {
 Данные карточки, используемые при отображении карточки товара
 
 ```
-export type TCardInfo = Pick<ICard, 'title' | 'price' | 'category' | 'image'>;
+type TCardInfo = Pick<ICard, 'title' | 'price' | 'category' | 'image'>;
 ```
 
 Данные, используемые при оформлении заказа
 
 ```
-export type TOrder = Pick<IOrder, 'payment' | 'address' | 'email' | 'phone'>;
+type TOrder = Pick<IOrder, 'payment' | 'address' | 'email' | 'phone'>;
 ```
 
 Данные, которые отображаются в корзине
 
 ```
-export type IBasket = Pick<IOrder, 'items' | 'total'>;
+type IBasket = Pick<IOrder, 'items' | 'total'>;
 ```
 
 Данные, которые отображаются в окне подтверждения успешного заказа
 
 ```
-export type ITotal = Pick<IOrder, 'total'>;
+type ITotal = Pick<IOrder, 'total'>;
 ```
 
 ## Архитектура приложения
@@ -151,7 +151,7 @@ export type ITotal = Pick<IOrder, 'total'>;
 - phone: string - номер телефона
 - address: string - адрес доставки
 - total: number - сумма заказа
-- items: ICard[] - массив заказанных товаров
+- items: ICard[] - массив выбранных товаров
 - events: IEvents - экземпляр класса `EventEmitter` для инициализации событий при изменении данных. 
 
 Также класс предоставляет набор методов для взаимодействия с этими данными:
@@ -174,13 +174,13 @@ export type ITotal = Pick<IOrder, 'total'>;
 - modal: HTMLElement - элемент модального окна
 - events: IEvents - брокер событий
 
-#### Класс ModalWithForm
+#### Класс ModalWithOrderForm
 
 Расширяет класс Modal. Предназначен для реализации модального окна с формой, содержащей поля ввода. При сабмите инициализирует событие, передавая в него объект с данными из полей ввода формы. При изменении данных в полях ввода инициирует событие изменения данных. Предоставляет методы для управления активностью кнопки сохранения. 
 
 Поля класса: 
 
-- submitButton: HTMLButtonElement - Кнопка подтверждения
+- submitButton: HTMLButtonElement - кнопка подтверждения
 - _form: HTMLFormElement - элемент формы
 - formName: string - значение атрибута name формы
 - inputs: NodeListOf<HTMLInputElement> - коллекция всех полей ввода формы
@@ -188,7 +188,22 @@ export type ITotal = Pick<IOrder, 'total'>;
 Методы: 
 
 - setValid (isValid: boolean): void - изменяет активность кнопки подтверждения
-- getInputValues(): Record<string, HTMLElement> - возвращает объект с данными из полей формы, где ключ - name инпута, значение - данные, введенные пользователем.
+- getInputValues(): Record<string, HTMLElement> - возвращает объект с данными из полей формы, где ключ - name инпута, значение - данные, введенные пользователем
+- showInputError (field: string, errorMessage: string):void - отображает полученный текст ошибки под указанным полем ввода
+- hideInputError (field: string):void - очищает текст ошибки под указанным полем ввода
+- close ():void - расширяет родительский метод, дополнительно очищая поля формы
+
+#### Класс ModalWithItem
+
+Расширяет класс Modal. Предназначен для реализации модального окна с товаром. При сабмите инициализирует событие, добавляя товар в корзину. 
+
+Поля класса: 
+
+- submitButton: HTMLButtonElement - кнопка подтверждения (добавление товара в корзине)
+
+Методы:
+
+- addToCart(id: string): void - добавляет товар в корзину
 
 #### Класс Card
 
@@ -209,7 +224,7 @@ export type ITotal = Pick<IOrder, 'total'>;
 
 #### Класс AppApi
 
-Принимает в конструктор экземпляр класса Api и представляет методы, еализующие взаимодействие с бэкендом сервиса
+Принимает в конструктор экземпляр класса Api и представляет методы, реализующие взаимодействие с бэкендом сервиса
 
 ## Взаимодействия компонентов 
 
@@ -222,9 +237,12 @@ export type ITotal = Pick<IOrder, 'total'>;
 *Список всех событий, которые могут генерироваться в системе:*
 
 - `card:selected` - изменение открываемой в модальном окне картинки карточки товара
+- `card:modalClear` - очистка выбранного id для показа в модальном окне
 
 *События, возникающие при взаимодействии пользователя с интерйесом (генерируются классами, отвечающими за представление):*
 
 - `card:select` - выбор карточки для отображения в модальном окне
 - `order:open` - открытие модального окна с заказом
 - `order:input` - изменение данных в форме с заказом
+- `order:validation` - событие, сообщающее о необходимости валидации формы заказа
+- `newPurchases:submit` - 
