@@ -1,3 +1,8 @@
+export interface IHomePage {
+  catalog: ICard[];
+  basketTotal: number; 
+}
+
 export interface ICard {
   id: string;
   description: string;
