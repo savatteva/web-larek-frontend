@@ -1,16 +1,19 @@
 export interface IHomePage {
-  catalog: ICard[];
+  catalog: IProduct[];
+  basket: string[];
+  order: IOrder | null;
   basketTotal: number; 
+  preview: string | null;
 }
 
-export interface ICard {
+export interface IProduct {
   id: string;
   description: string;
   image: string;
   title: string;
   category: string;
-  price: number;
-  addToCart(cardId: string): void;
+  price: number | null;
+  index:  number;
 }
 
 export interface IOrder {
@@ -18,23 +21,19 @@ export interface IOrder {
   email: string;
   phone: string;
   address: string;
-  total: number;
-  items: ICard[];
-  deleteItem(cardId: string, payload: Function | null): void; 
-  orderItems(items: ICard[]): void;
+  items: string[];
 }
 
-export interface ICardsData {
-  cards: ICard[];
+export interface IProductsData {
+  products: IProduct[];
   preview: string | null;
-  getCard(cardId: string): void;
+  getProduct(cardId: string): void;
 }
 
-export type TCardInfo = Pick<ICard, 'title' | 'price' | 'category' | 'image'>;
+export interface IApi {
+  getProducts: () => Promise<IProduct[]>
+}
+
+export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
 
 export type TOrder = Pick<IOrder, 'payment' | 'address' | 'email' | 'phone'>;
-
-export type IBasket = Pick<IOrder, 'items' | 'total'>;
-
-export type ITotal = Pick<IOrder, 'total'>;
-
