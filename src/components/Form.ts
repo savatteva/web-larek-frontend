@@ -14,13 +14,8 @@ export class Form<IOrder> extends Component<IOrder> {
     super(container)
 
     this.inputs = this.container.querySelectorAll('.form__input');
-    this._form = ensureElement<HTMLFormElement>('.form');
+    this._form = container.querySelector('.form');
     this.submitBtn = this.container.querySelector('.order__button');
-
-    this._form.addEventListener('submit', (e) => {
-      e.preventDefault()
-      events.emit(`${this.formName}:submit`)
-    })
 
     this.container.addEventListener('input', (e: Event) => {
       const target = e.target as HTMLInputElement;
@@ -31,10 +26,11 @@ export class Form<IOrder> extends Component<IOrder> {
   }
   
   protected onInputChange(field: keyof IOrder, value: string) {
-    this.events.emit(`${this._form}.${String(field)}:change`, {
-        field,
-        value
+    this.events.emit(`${String(field)}:change`, {
+      field,
+      value
     });
+
 }
 
   protected getInputValues() {

@@ -26,7 +26,7 @@ export class Contacts extends Form<IOrder> {
     })
   }
 
-  set phone(value: string) {
+  set phone(value: string) { 
     this._phone.value = value;
   }
 

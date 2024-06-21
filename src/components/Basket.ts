@@ -45,5 +45,4 @@ export class Basket extends Component<IBasket> {
   set total(total: number) {
     this.setText(this._total, `${total}` + ' синапсисов')
   }
-
 }

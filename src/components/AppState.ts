@@ -6,17 +6,23 @@ import { Model } from './base/Model'
 
 export class AppState extends Model<IHomePage> {
   protected _products: IProduct[];
-  protected _order: IOrder;
+  protected _order: IOrder = {
+    payment: "",
+    email: "",
+    phone: "",
+    'address': "",
+    items: [],
+    total: 0
+  };
   protected _basket: IProduct[] = [];
-  protected _basketTotal: number;
   protected events: IEvents;
 
   set products(products: IProduct[]) {
     this._products = products;
   }
 
-  get basketTotal() {
-    return this._basketTotal
+  set order(order: IOrder) {
+    this._order = order;
   }
 
   get order() {
@@ -35,6 +41,10 @@ export class AppState extends Model<IHomePage> {
     return this._products.find((item) => item.id === productId)
   }
 
+  clearBasket() {
+    this._basket.splice(0, this._basket.length)
+  }
+
   toBasket(product: IProduct) {
     if(!this._basket.includes(product)) {
       this._basket.push(product)
@@ -50,7 +60,7 @@ export class AppState extends Model<IHomePage> {
     return this.basket.reduce((sum, product) => sum + product.price, 0);
   }  
 
-  setOrderField(field: keyof Omit<IOrder, 'items'>, value: string) {
+  setOrderField(field: keyof Omit<IOrder, 'items' | 'total'>, value: string) {
     this._order[field] = value;
     this.events.emit('order:ready', this._order);
   }

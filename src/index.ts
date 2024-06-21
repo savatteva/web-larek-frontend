@@ -16,7 +16,6 @@ import { IOrder } from './types/index'
 import { Success } from './components/Success'
 
 const events = new EventEmitter(); // создание экземпляра брокера событий
-// const productsData = new ProductsData(events); // создание экземпляра айтемов
 
 const cardCatalog = ensureElement<HTMLTemplateElement>('#card-catalog');
 const productContainer = new ProductsContainer(document.querySelector('.gallery'))
@@ -142,26 +141,21 @@ const contacts = ensureElement<HTMLTemplateElement>('#contacts')
 const contactsView = new Contacts(cloneTemplate(contacts), events);
   
 events.on('order:open', () => {
+  appState.order.total = appState.setTotal()
+  appState.order.items = appState.basket.map(item => item.id)
   modal.render({
     content: orderView.render({})
   })
+
+  console.log(appState)
 })
 
-// events.on(/^order\..*:change/, (data: { field: keyof IOrder, value: string }) => {
-//   appState.setOrderField(data.field, data.value);
-//   console.log(appState.order)
-// });
+events.on(/.*:change/, (data: { field: keyof Omit<IOrder, 'items' | 'total'>, value: string }) => {
+  appState.setOrderField(data.field, data.value);
+});
 
-// events.on(/^contacts\..*:change/, (data: { field: keyof IOrder, value: string }) => {
-//   appState.setOrderField(data.field, data.value);
-// });
-
-// events.on('payment:choosed', (data: { payment: string }) => {
-//   appState.setOrderField("payment", data.payment)
-// })
-
-events.on('/^order:submit', () => {
-
+events.on('payment:choosed', (data: { payment: string }) => {
+  appState.setOrderField('payment', data.payment)
 })
 
 events.on('order:submit', () => {
@@ -171,16 +165,33 @@ events.on('order:submit', () => {
 })
 
 const success = ensureElement<HTMLTemplateElement>('#success');
-const successView = new Success(cloneTemplate(success));
 
-events.on('/^contacts:submit', () => {
-  const items = appState.basket
-  const total = appState.basketTotal
-  items.map(item => item.id)
+events.on('contacts:submit', () => {
 
-  modal.render({
-    content: successView.render({})
-  });
+  api.orderProducts(appState.order)
+  .then(result => {
+    const successView = new Success(cloneTemplate(success), { onClick: () => { 
+      modal.close() 
+      appState.clearBasket()
+      basketCounter.textContent = String(appState.basket.length)
+      appState.order = { 
+        payment: "",
+        email: "",
+        phone: "",
+        address: "",
+        items: [],
+        total: 0
+      } 
+    }});
+
+    modal.render({
+      content: successView.render({
+        total: appState.order.total
+      })
+    });
+  })
+  .catch(err => console.log(err)) 
+
 }) 
 
 events.onAll((event) => {

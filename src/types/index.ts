@@ -20,8 +20,9 @@ export interface IOrder {
   payment: string;
   email: string;
   phone: string;
-  address: string;
+  'address': string;
   items: string[];
+  total: number;
 }
 
 export interface IProductsData {

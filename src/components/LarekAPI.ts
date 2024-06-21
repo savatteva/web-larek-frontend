@@ -1,5 +1,9 @@
-import { IApi, IProduct } from "../types";
+import { IApi, IOrder, IProduct } from "../types";
 import { Api, ApiListResponse } from "./base/api";
+
+interface IOrderResult {
+  id: string;
+}
 
 export class LarekApi extends Api implements IApi {
   readonly cdn: string;
@@ -16,5 +20,9 @@ export class LarekApi extends Api implements IApi {
         image: this.cdn + item.image
       }))
     )
+  }
+
+  orderProducts(order: IOrder): Promise<IOrderResult> {
+    return this.post('/order', order).then((data: IOrderResult) => data)
   }
 }
