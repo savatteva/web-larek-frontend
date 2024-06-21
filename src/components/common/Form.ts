@@ -1,11 +1,7 @@
-import { Modal } from './common/Modal'
-import { IOrder } from '../types/index'
-import { IEvents } from './base/events'
-import { ensureElement } from '../utils/utils';
-import { Component } from './base/Component';
+import { IEvents } from '../base/events'
+import { Component } from '../base/Component';
 
 export class Form<IOrder> extends Component<IOrder> {
-  protected inputs: NodeListOf<HTMLInputElement>;
   protected _form: HTMLFormElement;
   protected submitBtn: HTMLButtonElement;
   protected formName: string;
@@ -13,7 +9,6 @@ export class Form<IOrder> extends Component<IOrder> {
   constructor(container: HTMLFormElement, protected events: IEvents) {
     super(container)
 
-    this.inputs = this.container.querySelectorAll('.form__input');
     this._form = container.querySelector('.form');
     this.submitBtn = this.container.querySelector('.order__button');
 
@@ -32,20 +27,6 @@ export class Form<IOrder> extends Component<IOrder> {
     });
 
 }
-
-  protected getInputValues() {
-		const valuesObject: Record<string, string> = {};
-		this.inputs.forEach((element) => {
-			valuesObject[element.name] = element.value;
-		});
-		return valuesObject;
-	}
-
-  set inputValues(data: Record<string, string>) {
-		this.inputs.forEach((element) => {
-			element.value = data[element.name];
-		});
-	}
 
   close() {
 		this._form.reset();

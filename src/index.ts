@@ -2,17 +2,15 @@ import './scss/styles.scss';
 import { EventEmitter } from './components/base/events'
 import { API_URL, CDN_URL } from './utils/constants'
 import { LarekApi } from './components/LarekAPI'
-import { IProduct } from './types';
+import { IProduct, TOrder } from './types';
 import { Product } from './components/Product'
 import { cloneTemplate, ensureElement } from './utils/utils';
 import { ProductsContainer } from './components/ProductsContainer'
 import { AppState } from './components/AppState'
 import { Modal } from './components/common/Modal'
 import { Basket } from './components/Basket'
-import { Form } from './components/Form'
 import { Order } from './components/Order'
 import { Contacts } from './components/Contacts'
-import { IOrder } from './types/index'
 import { Success } from './components/Success'
 
 const events = new EventEmitter(); // создание экземпляра брокера событий
@@ -146,11 +144,9 @@ events.on('order:open', () => {
   modal.render({
     content: orderView.render({})
   })
-
-  console.log(appState)
 })
 
-events.on(/.*:change/, (data: { field: keyof Omit<IOrder, 'items' | 'total'>, value: string }) => {
+events.on(/.*:change/, (data: { field: keyof TOrder, value: string }) => {
   appState.setOrderField(data.field, data.value);
 });
 
@@ -193,7 +189,3 @@ events.on('contacts:submit', () => {
   .catch(err => console.log(err)) 
 
 }) 
-
-events.onAll((event) => {
-  console.log(event.eventName, event.data);
-}) // слежка за всеми событиями 

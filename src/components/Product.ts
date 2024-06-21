@@ -1,5 +1,4 @@
-import { IEvents } from "./base/events";
-import { cloneTemplate, ensureElement } from '../utils/utils'
+import { ensureElement } from '../utils/utils'
 import { IProduct } from "../types";
 import { Component } from './base/Component'
 
@@ -17,7 +16,7 @@ export class Product extends Component<IProduct> {
   protected _index?: HTMLElement;
 
   constructor(blockName: string, container: HTMLElement, actions?: IProductActions) {
-    super(container) // если класс наследуется, то надо обращаться к родителю (если есть конструктор)
+    super(container)
     this._title = ensureElement<HTMLElement>(`.${blockName}__title`, container);
     this._image = container.querySelector(`.${blockName}__image`);
     this._category = container.querySelector(`.${blockName}__category`);

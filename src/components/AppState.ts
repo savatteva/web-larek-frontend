@@ -1,6 +1,4 @@
-import { IHomePage, IOrder, IProduct } from "../types";
-import { ensureElement } from "../utils/utils";
-import { Component } from "./base/Component";
+import { IHomePage, IOrder, IProduct, TOrder } from "../types";
 import { IEvents } from "./base/events";
 import { Model } from './base/Model'
 
@@ -10,7 +8,7 @@ export class AppState extends Model<IHomePage> {
     payment: "",
     email: "",
     phone: "",
-    'address': "",
+    address: "",
     items: [],
     total: 0
   };
@@ -37,10 +35,6 @@ export class AppState extends Model<IHomePage> {
     return this._products
   }
 
-  getProduct(productId: string | null) {
-    return this._products.find((item) => item.id === productId)
-  }
-
   clearBasket() {
     this._basket.splice(0, this._basket.length)
   }
@@ -60,7 +54,7 @@ export class AppState extends Model<IHomePage> {
     return this.basket.reduce((sum, product) => sum + product.price, 0);
   }  
 
-  setOrderField(field: keyof Omit<IOrder, 'items' | 'total'>, value: string) {
+  setOrderField(field: keyof TOrder, value: string) {
     this._order[field] = value;
     this.events.emit('order:ready', this._order);
   }

@@ -20,19 +20,18 @@ export interface IOrder {
   payment: string;
   email: string;
   phone: string;
-  'address': string;
+  address: string;
   items: string[];
   total: number;
 }
 
-export interface IProductsData {
-  products: IProduct[];
-  preview: string | null;
-  getProduct(cardId: string): void;
+export interface IOrderResult {
+  id: string;
 }
 
 export interface IApi {
   getProducts: () => Promise<IProduct[]>
+  orderProducts(order: IOrder): Promise<IOrderResult>
 }
 
 export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';

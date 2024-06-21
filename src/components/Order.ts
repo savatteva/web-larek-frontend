@@ -1,6 +1,5 @@
-import { EventEmitter, IEvents } from './base/events';
-import { Form } from './Form';
-import { ensureElement } from '../utils/utils';
+import { IEvents } from './base/events';
+import { Form } from './common/Form';
 import { IOrder } from '../types';
 
 export class Order extends Form<IOrder> {

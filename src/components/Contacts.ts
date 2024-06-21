@@ -1,5 +1,5 @@
 import { IEvents } from './base/events';
-import { Form } from './Form'
+import { Form } from './common/Form'
 import { ensureElement } from '../utils/utils';
 import { IOrder } from '../types';
 

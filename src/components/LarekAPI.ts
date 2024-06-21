@@ -1,9 +1,7 @@
-import { IApi, IOrder, IProduct } from "../types";
+import { IApi, IOrder, IProduct, IOrderResult } from "../types";
 import { Api, ApiListResponse } from "./base/api";
 
-interface IOrderResult {
-  id: string;
-}
+
 
 export class LarekApi extends Api implements IApi {
   readonly cdn: string;

@@ -46,21 +46,25 @@ yarn build
 
 ```
 interface IHomePage {
-  catalog: ICard[];
+  catalog: IProduct[];
+  basket: string[];
+  order: IOrder | null;
   basketTotal: number; 
+  preview: string | null;
 }
 ```
 
 Карточка товара
 
 ```
-interface ICard {
+interface IProduct {
   id: string;
   description: string;
   image: string;
   title: string;
   category: string;
   price: number | null;
+  index:  number;
 }
 ```
 
@@ -68,12 +72,21 @@ interface ICard {
 
 ```
 interface IOrder {
-  payment: string | null;
+  payment: string;
   email: string;
   phone: string;
   address: string;
+  items: string[];
+  total: number;
+}
+```
+
+Интерфейс корзины 
+```
+interface IBasket {
+  products: HTMLElement[];
   total: number | null;
-  items: ICard[];
+  selected: number
 }
 ```
 
@@ -83,6 +96,50 @@ interface IOrder {
 interface IProductsData {
   products: ICard[];
   preview: string | null;
+}
+```
+Интерфейс для контейнера товаров
+
+```
+interface IProductsContainer {
+  catalog: HTMLElement[];
+}
+```
+
+Интерфейс данных после отправки заказа на сервер
+
+```
+interface IOrderResult {
+  id: string;
+}
+```
+
+Интерфейс ответа сервера
+
+```
+interface IApi {
+  getProducts: () => Promise<IProduct[]>
+  orderProducts(order: IOrder): Promise<IOrderResult>
+}
+```
+
+Тип для работы с некоторыми полями заказа
+
+```
+type TOrder = Pick<IOrder, 'payment' | 'address' | 'email' | 'phone'>;
+```
+
+Тип для установки метода API
+
+```
+type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
+```
+
+Интерфейс окна подтверждения: 
+
+```
+interface ISuccess {
+  total: number;
 }
 ```
 
@@ -157,15 +214,17 @@ interface IProductsData {
 - `_products`: IProduct[] - товары;
 - `_order`: IOrder - заказ;
 - `_basket`: IProduct[] = [] - корзина;
-- `_basketTotal`: number - сумма заказа;
 - `events`: IEvents - экземпляр брокера событий;
 
 Методы класса: 
 
+- `clearBasket()` - очистка корзины
 - `toBasket(product: IProduct)` - добавление в корзину
 - `deleteFromBasket(product: IProduct)` - удаление из корзины
 - `setTotal()` - подсчет суммы корзины
-- `setOrderField(field: keyof Omit<IOrder, 'items'>, value: string)` - передаем заказ в объект для отправки на сервер
+- `setOrderField(field: keyof TOrder, value: string)` - передаем заказ в объект для отправки на сервер
+
+Также геттеры и сеттеры для работы с полями класса.
 
 ### Классы представления
 
@@ -189,9 +248,9 @@ interface IProductsData {
 
 Также сеттер для отображения контента. 
 
-#### Класс Form
+#### Класс Form<T>
 
-Расширяет базовый класс Component.
+Расширяет базовый класс Component. Является дженериком. 
 
 Поля класса: 
 
@@ -219,6 +278,36 @@ interface IProductsData {
 
 - `setPayment(button: HTMLButtonElement)` - выбор типа оплаты
 
+Также сеттер. 
+
+#### Класс Contacts
+
+Расширяет класс Form. Предназначен для реализации модального окна с формой, содержащей поля ввода. При сабмите инициализирует событие, передавая в него объект с данными из полей ввода формы. При изменении данных в полях ввода инициирует событие изменения данных. 
+
+Поля класса: 
+
+- `_email` - инпут элемент почты
+- `_phone` - инпут элемент телефона
+- `_button` - кнопка
+
+Методы: 
+
+Сеттеры для установки значений. 
+
+#### Класс  Basket
+
+Расширяет базовый класс Component. 
+
+Поля класса: 
+
+- `_list` - список товаров
+- `_total` - общая сумма заказа
+- `_button` - кнопка
+
+Методы: 
+
+Содержит также сеттеры значений. 
+
 #### Класс  Product<T>
 
 Отвечает за отображение карточки товара, в которой можно посмотреть наименование, стоимость, описание, картинку, категорию. В классе устанавливаются слушатели на все интерактивные элементы, в результате взаимодействия с которыми генерируются соответствующие события. 
@@ -233,11 +322,38 @@ interface IProductsData {
 
 `constructor (container: HTMLElement)` -   в конструктор принимает контейнер, в котором размещаются карточки
 
+Поля класса: 
+
+- `_catalog: HTMLElement` - каталог
+- `container: HTMLElement` - контейнер, в котором размещаются карточки
+
+#### Класс Success 
+
+Отвечает за отображение модального окна при успешном совершении заказа.
+
+Поля класса: 
+
+- `_close` - кнопка закрытия
+- `_total` - общая сумма заказа
+
+Содержит сеттер установки содержимого суммы.
+
 ### Слой коммуникаций 
 
-#### Класс AppApi
+#### Класс LarekApi
 
 Принимает в конструктор экземпляр класса Api и представляет методы, реализующие взаимодействие с бэкендом сервиса
+
+`constructor(cdn: string, baseUrl: string, options?: RequestInit)` - в конструктор принимает cdn, baseUrl и опции
+
+Поля класса: 
+
+`readonly cdn: string;` - cdn
+
+Методы класса: 
+
+- `getProducts(): Promise<IProduct[]> ` - получение карточек с сервера
+- `orderProducts(order: IOrder): Promise<IOrderResult>` - заказ продуктов
 
 ## Взаимодействия компонентов 
 
