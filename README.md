@@ -90,14 +90,6 @@ interface IBasket {
 }
 ```
 
-Интерфейс для модели данных карточки товара
-
-```
-interface IProductsData {
-  products: ICard[];
-  preview: string | null;
-}
-```
 Интерфейс для контейнера товаров
 
 ```
