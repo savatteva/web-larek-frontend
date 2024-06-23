@@ -113,9 +113,6 @@ export class AppState extends Model<IHomePage> {
 
   setOrderField(field: keyof TOrder, value: string) {
     this._order[field] = value;
-
-    if (this.validateOrder() && this.validateContacts()) {
-      this.events.emit('order:ready', this._order);
-    }
+    this.validateOrder() && this.validateContacts()
   }
 }
