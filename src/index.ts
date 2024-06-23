@@ -2,27 +2,22 @@ import './scss/styles.scss';
 import { EventEmitter } from './components/base/events'
 import { API_URL, CDN_URL } from './utils/constants'
 import { LarekApi } from './components/LarekAPI'
-import { IProduct, TOrder } from './types';
+import { IOrder, IProduct, TOrder } from './types';
 import { Product } from './components/Product'
 import { cloneTemplate, ensureElement } from './utils/utils';
-import { ProductsContainer } from './components/ProductsContainer'
 import { AppState } from './components/AppState'
 import { Modal } from './components/common/Modal'
 import { Basket } from './components/Basket'
 import { Order } from './components/Order'
 import { Contacts } from './components/Contacts'
 import { Success } from './components/Success'
+import { Page } from './components/Page'
 
-const events = new EventEmitter(); // создание экземпляра брокера событий
+const events = new EventEmitter();
 
 const cardCatalog = ensureElement<HTMLTemplateElement>('#card-catalog');
-const productContainer = new ProductsContainer(document.querySelector('.gallery'))
-const basketBtn = document.querySelector('.header__basket');
-const basketCounter = document.querySelector('.header__basket-counter');
 
-basketBtn.addEventListener('click', () => {
-  events.emit('basket:open');
-})
+const page = new Page(document.body, events);
 
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events)
 const modalPreview = ensureElement<HTMLTemplateElement>('#card-preview');
@@ -40,7 +35,7 @@ api.getProducts()
 })
 
 events.on('products:loaded', () => {
-  const productsArray = appState.products.map(product =>{
+  page.catalog = appState.products.map(product =>{
     const initialProduct = new Product('card', cloneTemplate(cardCatalog), {
       onClick: () => events.emit('card:select', product)
   });
@@ -52,28 +47,39 @@ events.on('products:loaded', () => {
       price: product.price,
     });
   })
+})
 
-  productContainer.render({catalog: productsArray})
+events.on('modal:open', () => {
+  page.locked = true;
+})
+
+events.on('modal:close', () => {
+  page.locked = false;
 })
 
 events.on('card:select', (item: IProduct) => {
+  const selectedCard = appState.getProduct(item.id);
   const preview = new Product('card', cloneTemplate(modalPreview), {
     onClick: () => {
       if (appState.basket.includes(item)) {
+        preview.setText(preview.button, 'В корзину')
         events.emit('card:deletefromcart', item)
-        preview.button.textContent = 'В корзину'
       } else {
         events.emit('card:addtocart', item)
-        preview.button.textContent = 'Удалить из корзины'
+        preview.setText(preview.button, 'Удалить из корзины')
       }
     }
   })
+
+  if (selectedCard.price === null) {
+    preview.setDisabled(preview.button, true)
+  }
   
   if (!appState.basket.includes(item)) {
-    preview.button.textContent = 'В корзину'
+    preview.setText(preview.button, 'В корзину')
   } else {
-    preview.button.textContent = 'Удалить из корзины'
-  }
+    preview.setText(preview.button, 'Удалить из корзины')
+  } 
 
   modal.render({
     content: preview.render({
@@ -88,15 +94,7 @@ events.on('card:select', (item: IProduct) => {
 
 events.on('card:addtocart', (item: IProduct) => {
   appState.toBasket(item);
-  basketCounter.textContent = String(appState.basket.length)
-})
-
-events.on('modal:open', () => {
-  document.querySelector('.page__wrapper').classList.add('page__wrapper_locked');
-})
-
-events.on('modal:close', () => {
-  document.querySelector('.page__wrapper').classList.remove('page__wrapper_locked');
+  page.counter = appState.basket.length
 })
 
 const basket = ensureElement<HTMLTemplateElement>('#basket');
@@ -127,8 +125,7 @@ events.on('basket:open', () => {
 
 events.on('card:deletefromcart', (item: IProduct) => {
   appState.deleteFromBasket(item);
-  basketCounter.textContent = String(appState.basket.length);
-
+  page.counter = appState.basket.length
   events.emit('basket:open')
 })
 
@@ -142,11 +139,19 @@ events.on('order:open', () => {
   appState.order.total = appState.setTotal()
   appState.order.items = appState.basket.map(item => item.id)
   modal.render({
-    content: orderView.render({})
+    content: orderView.render({
+      valid: false,
+      errors: []
+    })
   })
 })
 
-events.on(/.*:change/, (data: { field: keyof TOrder, value: string }) => {
+
+events.on(/^order\..*:change/, (data: { field: keyof TOrder, value: string }) => {
+  appState.setOrderField(data.field, data.value);
+});
+
+events.on(/^contacts\..*:change/, (data: { field: keyof TOrder, value: string }) => {
   appState.setOrderField(data.field, data.value);
 });
 
@@ -154,9 +159,24 @@ events.on('payment:choosed', (data: { payment: string }) => {
   appState.setOrderField('payment', data.payment)
 })
 
+events.on('formErrors:change', (errors: Partial<IOrder>) => {
+  const { payment, address } = errors;
+  
+  orderView.valid = !payment && !address;
+  orderView.errors = Object.values({address, payment}).filter(i => !!i).join('; ');
+
+  const { phone, email } = errors;
+
+  contactsView.valid = !phone && !email;
+  contactsView.errors = Object.values({phone, email}).filter(i => !!i).join('; ');
+});
+
 events.on('order:submit', () => {
   modal.render({
-    content: contactsView.render({})
+    content: contactsView.render({
+      valid: false,
+      errors: []
+    })
   })
 })
 
@@ -169,7 +189,7 @@ events.on('contacts:submit', () => {
     const successView = new Success(cloneTemplate(success), { onClick: () => { 
       modal.close() 
       appState.clearBasket()
-      basketCounter.textContent = String(appState.basket.length)
+      page.counter = appState.basket.length
       appState.order = { 
         payment: "",
         email: "",
@@ -189,3 +209,7 @@ events.on('contacts:submit', () => {
   .catch(err => console.log(err)) 
 
 }) 
+
+events.onAll((event) => {
+  console.log(event.eventName, event.data);
+})

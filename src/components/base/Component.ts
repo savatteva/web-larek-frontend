@@ -14,7 +14,7 @@ export abstract class Component<T> {
     }
 
     // Установить текстовое содержимое
-    protected setText(element: HTMLElement, value: unknown) {
+    setText(element: HTMLElement, value: unknown) {
         if (element) {
             element.textContent = String(value);
         }
@@ -26,16 +26,6 @@ export abstract class Component<T> {
             if (state) element.setAttribute('disabled', 'disabled');
             else element.removeAttribute('disabled');
         }
-    }
-
-    // Скрыть
-    protected setHidden(element: HTMLElement) {
-        element.style.display = 'none';
-    }
-
-    // Показать
-    protected setVisible(element: HTMLElement) {
-        element.style.removeProperty('display');
     }
 
     // Установить изображение с алтернативным текстом

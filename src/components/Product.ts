@@ -12,7 +12,7 @@ export class Product extends Component<IProduct> {
   protected _category?: HTMLElement;
   protected _price: HTMLElement;
   protected _description?: HTMLElement;
-  protected _button?: HTMLButtonElement;
+  protected _button?: HTMLElement;
   protected _index?: HTMLElement;
 
   constructor(blockName: string, container: HTMLElement, actions?: IProductActions) {

@@ -1,4 +1,4 @@
-import { IHomePage, IOrder, IProduct, TOrder } from "../types";
+import { FormErrors, IHomePage, IOrder, IProduct, TOrder } from "../types";
 import { IEvents } from "./base/events";
 import { Model } from './base/Model'
 
@@ -13,7 +13,9 @@ export class AppState extends Model<IHomePage> {
     total: 0
   };
   protected _basket: IProduct[] = [];
+  protected _preview: string | null;
   protected events: IEvents;
+  protected formErrors: FormErrors = {};
 
   set products(products: IProduct[]) {
     this._products = products;
@@ -35,6 +37,29 @@ export class AppState extends Model<IHomePage> {
     return this._products
   }
 
+  set id(id: string) {
+    this.preview = id;
+  }
+
+  get id() {
+    return this.preview;
+  }
+
+  getProduct(cardId: string) {
+    return  this._products.find((item) => item.id === cardId)
+  }
+
+  set preview(cardId: string | null) {
+    if (!cardId) {
+        this._preview = null;
+        return;
+    }
+    const selectedCard = this.getProduct(cardId);
+    if (selectedCard) {
+      this._preview = cardId;  
+    }
+}
+
   clearBasket() {
     this._basket.splice(0, this._basket.length)
   }
@@ -52,10 +77,45 @@ export class AppState extends Model<IHomePage> {
 
   setTotal(): number {
     return this.basket.reduce((sum, product) => sum + product.price, 0);
-  }  
+  } 
+
+  validateOrder() {
+    const errors: typeof this.formErrors = {};
+
+    if(!this._order.payment) {
+      errors.payment = 'Необходимо указать тип оплаты';
+    }
+
+    if (!this._order.address) {
+      errors.address = 'Необходимо указать адрес';
+    }
+
+    this.formErrors = errors;
+    this.events.emit('formErrors:change', this.formErrors);
+    return Object.keys(errors).length === 0;
+  }
+
+  validateContacts() {
+    const errors: typeof this.formErrors = {};
+
+    if (!this._order.email) {
+      errors.email = 'Необходимо указать email';
+    }
+
+    if (!this._order.phone) {
+      errors.phone = 'Необходимо указать телефон';
+    }
+
+    this.formErrors = errors;
+    this.events.emit('formErrors:change', this.formErrors);
+    return Object.keys(errors).length === 0;
+  }
 
   setOrderField(field: keyof TOrder, value: string) {
     this._order[field] = value;
-    this.events.emit('order:ready', this._order);
+
+    if (this.validateOrder() && this.validateContacts()) {
+      this.events.emit('order:ready', this._order);
+    }
   }
 }

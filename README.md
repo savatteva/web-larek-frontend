@@ -106,6 +106,15 @@ interface IOrderResult {
 }
 ```
 
+Интерфейс состояния формы 
+
+```
+interface IFormState {
+  valid: boolean;
+  errors: string[];
+}
+```
+
 Интерфейс ответа сервера
 
 ```
@@ -181,8 +190,6 @@ interface ISuccess {
 - `toggleClass(element: HTMLElement, className: string, force?: boolean)` - переключение класса 
 - `setText(element: HTMLElement, value: unknown)` - присвоить текст
 - `setDisabled(element: HTMLElement, state: boolean)` - добавить атрибут disabled
-- `setHidden(element: HTMLElement)` - сделать элемент невидимым
-- `setVisible(element: HTMLElement)` - сделать элемент видимым
 - `setImage(element: HTMLImageElement, src: string, alt?: string)` - установить изображение
 - `render(data?: Partial<T>): HTMLElement` - рендер элемента
 
@@ -206,15 +213,20 @@ interface ISuccess {
 - `_products`: IProduct[] - товары;
 - `_order`: IOrder - заказ;
 - `_basket`: IProduct[] = [] - корзина;
+- `_preview: string | null;` - выбранный товар для отображения
 - `events`: IEvents - экземпляр брокера событий;
+- `formErrors: FormErrors = {}` - ошибки формы
 
 Методы класса: 
 
+- `getProduct(cardId: string)` - достать id карточки товара для превью
 - `clearBasket()` - очистка корзины
 - `toBasket(product: IProduct)` - добавление в корзину
 - `deleteFromBasket(product: IProduct)` - удаление из корзины
 - `setTotal()` - подсчет суммы корзины
 - `setOrderField(field: keyof TOrder, value: string)` - передаем заказ в объект для отправки на сервер
+- `validateOrder()` - метод для валидации формы заказа
+- `validateContacts()` - метод для валидации формы контактов
 
 Также геттеры и сеттеры для работы с полями класса.
 
@@ -249,6 +261,7 @@ interface ISuccess {
 - `_form: HTMLFormElement` - элемент формы
 - `submitBtn: HTMLButtonElement` - кнопка сабмита
 - `formName: string` - название формы
+- `_errors: HTMLElement` - ошибки формы
 
 Методы класса: 
 
@@ -280,7 +293,6 @@ interface ISuccess {
 
 - `_email` - инпут элемент почты
 - `_phone` - инпут элемент телефона
-- `_button` - кнопка
 
 Методы: 
 
@@ -366,3 +378,4 @@ interface ISuccess {
 - `basket:open` - открытие корзины
 - `order:open` - открытие заказа
 - `order:submit` - отправка заказа
+- `formErrors:change` - наличие ошибок в компоненте

@@ -29,6 +29,8 @@ export interface IOrderResult {
   id: string;
 }
 
+export type FormErrors = Partial<Record<keyof IOrder, string>>;
+
 export interface IApi {
   getProducts: () => Promise<IProduct[]>
   orderProducts(order: IOrder): Promise<IOrderResult>

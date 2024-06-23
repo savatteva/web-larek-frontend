@@ -15,29 +15,22 @@ export class Order extends Form<IOrder> {
     this.card = this.container.querySelector('button[name="card"]');
 
     this._address = container.querySelector<HTMLInputElement>('input[name="address"]');
-    
-    this.submitBtn.addEventListener('click', () => {
-      events.emit('order:submit')
-    })
 
     this.cash.addEventListener('click', () => {
-      this.cash.classList.add('button_alt-active');
-      this.card.classList.remove('button_alt-active');
+      this.toggleClass(this.cash, 'button_alt-active')
+      if (this.card.classList.contains('button_alt-active')) {
+        this.toggleClass(this.card, 'button_alt-active')
+      }
       this.setPayment(this.cash);
     })
 
     this.card.addEventListener('click', () => {
-      this.card.classList.add('button_alt-active');
-      this.cash.classList.remove('button_alt-active');
+      this.toggleClass(this.card, 'button_alt-active')
+      if (this.cash.classList.contains('button_alt-active')) {
+        this.toggleClass(this.cash, 'button_alt-active')
+      }
       this.setPayment(this.card);
     })
-
-    this._address.addEventListener('input', () => {
-      if (this.card.classList.contains('button_alt-active') || this.cash.classList.contains('button_alt-active') ) {
-        this.submitBtn.removeAttribute('disabled')
-      }
-    })
-
   };
   
     set address(value: string) {
@@ -45,7 +38,7 @@ export class Order extends Form<IOrder> {
     }
 
     setPayment(button: HTMLButtonElement) {
-      if(button.classList.contains('button_alt-active') && button.getAttribute('name') === 'card') {
+      if (button.classList.contains('button_alt-active') && button.getAttribute('name') === 'card') {
         this._payment = 'card'
       } else {
         this._payment = 'cash'
