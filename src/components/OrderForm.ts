@@ -2,7 +2,7 @@ import { IEvents } from './base/events';
 import { Form } from './common/Form';
 import { IOrder } from '../types';
 
-export class Order extends Form<IOrder> {
+export class OrderForm extends Form<IOrder> {
   protected cash: HTMLButtonElement;
   protected card: HTMLButtonElement;
   protected _address: HTMLInputElement;
@@ -17,24 +17,28 @@ export class Order extends Form<IOrder> {
     this._address = container.querySelector<HTMLInputElement>('input[name="address"]');
 
     this.cash.addEventListener('click', () => {
-      this.toggleClass(this.cash, 'button_alt-active')
-      if (this.card.classList.contains('button_alt-active')) {
-        this.toggleClass(this.card, 'button_alt-active')
-      }
+      this.toggleCash();
+      this.toggleCard(false);
       this.setPayment(this.cash);
     })
 
     this.card.addEventListener('click', () => {
-      this.toggleClass(this.card, 'button_alt-active')
-      if (this.cash.classList.contains('button_alt-active')) {
-        this.toggleClass(this.cash, 'button_alt-active')
-      }
+      this.toggleCard();
+      this.toggleCash(false);
       this.setPayment(this.card);
     })
   };
   
     set address(value: string) {
       this._address.value = value;
+    }
+
+    toggleCard(state: boolean = true) {
+      this.toggleClass(this.card, 'button_alt-active', state);
+    }
+
+    toggleCash(state: boolean = true) {
+      this.toggleClass(this.cash, 'button_alt-active', state);
     }
 
     setPayment(button: HTMLButtonElement) {

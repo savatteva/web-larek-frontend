@@ -3,7 +3,7 @@ import { Form } from './common/Form'
 import { ensureElement } from '../utils/utils';
 import { IOrder } from '../types';
 
-export class Contacts extends Form<IOrder> {
+export class ContactsForm extends Form<IOrder> {
   protected _email: HTMLInputElement;
   protected _phone: HTMLInputElement;
 

@@ -30,12 +30,8 @@ export class Basket extends Component<IBasket> {
   }
 
   set selected(items: number) {
-    if (items > 0) {
-        this.setDisabled(this._button, false);
-    } else {
-        this.setDisabled(this._button, true);
-    }
-}
+    this.setDisabled(this._button, items <= 0);
+  }
 
   set products(products: HTMLElement[]) {
     this._list.replaceChildren(...products)

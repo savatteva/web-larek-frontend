@@ -8,8 +8,8 @@ import { cloneTemplate, ensureElement } from './utils/utils';
 import { AppState } from './components/AppState'
 import { Modal } from './components/common/Modal'
 import { Basket } from './components/Basket'
-import { Order } from './components/Order'
-import { Contacts } from './components/Contacts'
+import { OrderForm } from './components/OrderForm'
+import { ContactsForm } from './components/ContactsForm'
 import { Success } from './components/Success'
 import { Page } from './components/Page'
 
@@ -33,6 +33,7 @@ api.getProducts()
   appState.products = res;
   events.emit('products:loaded', res);
 })
+.catch(err => console.log(err))
 
 events.on('products:loaded', () => {
   page.catalog = appState.products.map(product =>{
@@ -130,10 +131,10 @@ events.on('card:deletefromcart', (item: IProduct) => {
 })
 
 const order = ensureElement<HTMLTemplateElement>('#order');
-const orderView = new Order(cloneTemplate(order), events);
+const orderView = new OrderForm(cloneTemplate(order), events);
 
 const contacts = ensureElement<HTMLTemplateElement>('#contacts')
-const contactsView = new Contacts(cloneTemplate(contacts), events);
+const contactsView = new ContactsForm(cloneTemplate(contacts), events);
   
 events.on('order:open', () => {
   appState.order.total = appState.setTotal()

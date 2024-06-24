@@ -14,6 +14,14 @@ export class Product extends Component<IProduct> {
   protected _description?: HTMLElement;
   protected _button?: HTMLElement;
   protected _index?: HTMLElement;
+  protected _categoryColor = <Record<string, string>> { 
+    "софт-скил": "soft",
+    "другое": "other",
+    "дополнительное": "additional",
+    "кнопка": "button",
+    "хард-скил": "hard"
+  }
+
 
   constructor(blockName: string, container: HTMLElement, actions?: IProductActions) {
     super(container)
@@ -47,24 +55,8 @@ export class Product extends Component<IProduct> {
   }
 
   set category(value: string) {
-    this.setText(this._category, value)
-     switch(value) {
-      case'софт-скил':
-      this._category.classList.add('card__category_soft');
-      break;
-      case'другое':
-      this._category.classList.add('card__category_other');
-      break;
-      case'дополнительное':
-      this._category.classList.add('card__category_additional');
-      break;
-      case'кнопка':
-      this._category.classList.add('card__category_button');
-      break;
-      case'хард-скил':
-      this._category.classList.add('card__category_button');
-      break;
-    }
+    this.setText(this._category, value);
+    this.toggleClass(this._category, `card__category_${this._categoryColor[value]}`, true)
   }
 
   set description(value: string) {
