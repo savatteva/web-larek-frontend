@@ -187,18 +187,20 @@ events.on('contacts:submit', () => {
 
   api.orderProducts(appState.order)
   .then(result => {
+    appState.clearBasket()
+    appState.order = { 
+      payment: "",
+      email: "",
+      phone: "",
+      address: "",
+      items: [],
+      total: appState.order.total
+    }
+    page.counter = appState.basket.length
+
     const successView = new Success(cloneTemplate(success), { onClick: () => { 
       modal.close() 
-      appState.clearBasket()
-      page.counter = appState.basket.length
-      appState.order = { 
-        payment: "",
-        email: "",
-        phone: "",
-        address: "",
-        items: [],
-        total: 0
-      } 
+      appState.order.total = 0
     }});
 
     modal.render({
@@ -207,7 +209,9 @@ events.on('contacts:submit', () => {
       })
     });
   })
-  .catch(err => console.log(err)) 
+  .catch(err => {
+    console.log(err)
+  }) 
 
 }) 
 
