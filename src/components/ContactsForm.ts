@@ -10,8 +10,8 @@ export class ContactsForm extends Form<IOrder> {
   constructor(container: HTMLFormElement, events: IEvents) {
     super(container, events);
 
-    this._email = ensureElement<HTMLInputElement>('input[name="email"]', this.container)
-    this._phone = ensureElement<HTMLInputElement>('input[name="phone"]', this.container)
+    this._email = container.elements.namedItem('email') as HTMLInputElement
+    this._phone = container.elements.namedItem('phone') as HTMLInputElement
   }
 
   set phone(value: string) { 

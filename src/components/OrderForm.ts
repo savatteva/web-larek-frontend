@@ -14,7 +14,7 @@ export class OrderForm extends Form<IOrder> {
     this.cash = this.container.querySelector('button[name="cash"]');
     this.card = this.container.querySelector('button[name="card"]');
 
-    this._address = container.querySelector<HTMLInputElement>('input[name="address"]');
+    this._address = container.elements.namedItem('address') as HTMLInputElement;
 
     this.cash.addEventListener('click', () => {
       this.toggleCash();

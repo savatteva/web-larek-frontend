@@ -106,6 +106,7 @@ events.on('basket:open', () => {
     const product = new Product('card', cloneTemplate(productInBasket), {
       onClick: () => {
         events.emit('card:deletefromcart', item)
+        events.emit('basket:open')
       }})
 
       return product.render({
@@ -127,7 +128,6 @@ events.on('basket:open', () => {
 events.on('card:deletefromcart', (item: IProduct) => {
   appState.deleteFromBasket(item);
   page.counter = appState.basket.length
-  events.emit('basket:open')
 })
 
 const order = ensureElement<HTMLTemplateElement>('#order');
